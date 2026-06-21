@@ -3,6 +3,7 @@ import { Outfit, Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/core/hooks/useAuth';
 import { EcoDataProvider } from '@/core/eco-data-provider'; // Import wrapper to keep it clean
+import PageShell from '@/core/components/PageShell';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -42,7 +43,9 @@ export default function RootLayout({
       <body className="antialiased min-h-screen bg-background text-foreground flex flex-col">
         <AuthProvider>
           <EcoDataProvider>
-            {children}
+            <PageShell>
+              {children}
+            </PageShell>
           </EcoDataProvider>
         </AuthProvider>
       </body>
