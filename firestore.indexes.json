@@ -1,0 +1,29 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "leaderboard",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ecoScore", "order": "DESCENDING" },
+        { "fieldPath": "co2SavedKg", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "logs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "date", "order": "DESCENDING" },
+        { "fieldPath": "ecoScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "activeMissions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "deadline", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User profile constraints
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Wallet savings constraints
+    match /savings/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Carbon logs constraints
+    match /carbon_history/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // AI weekly reports
+    match /weekly_reports/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Coach conversation history
+    match /coach_conversations/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Gamified active missions
+    match /missions/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Receipts analysis items
+    match /receipt_analyses/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // FCM and in-app notifications
+    match /notifications/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Leaderboard ranking stats (Written by Cloud Run API / Server actions, read by authenticated users)
+    match /leaderboard/{userId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Block client-side edits
+    }
+
+    // Community forest global aggregate (managed by backend, read by authenticated users)
+    match /community_forest/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}
