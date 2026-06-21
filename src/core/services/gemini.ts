@@ -93,14 +93,22 @@ Ensure advice is specific, highly actionable, and includes:
     }
   }
 
-  // 4. Check if the query is a follow-up question
-  const isFollowUp = queryLower.includes('why') || 
+  // Check if direct keywords are present
+  const hasTopicKeyword = queryLower.includes('travel') || queryLower.includes('commute') || queryLower.includes('car') || queryLower.includes('bus') || queryLower.includes('transit') || queryLower.includes('metro') || queryLower.includes('petrol') || queryLower.includes('scooter') ||
+                          queryLower.includes('diet') || queryLower.includes('food') || queryLower.includes('eat') || queryLower.includes('meat') || queryLower.includes('vegan') || queryLower.includes('vegetarian') || queryLower.includes('millet') ||
+                          queryLower.includes('energy') || queryLower.includes('electricity') || queryLower.includes('ac') || queryLower.includes('air conditioning') || queryLower.includes('power') || queryLower.includes('solar') || queryLower.includes('fan') || queryLower.includes('light') || queryLower.includes('watt') ||
+                          queryLower.includes('waste') || queryLower.includes('recycle') || queryLower.includes('compost') || queryLower.includes('trash') || queryLower.includes('garbage');
+
+  // 4. Check if the query is a follow-up question (only if it doesn't specify a direct topic)
+  const isFollowUp = !hasTopicKeyword && (
+                     queryLower.includes('why') || 
                      queryLower.includes('how') || 
                      queryLower.includes('tell me more') || 
                      queryLower.includes('what else') || 
                      queryLower.includes('suggest more') || 
                      queryLower.includes('detail') ||
-                     queryLower.includes('explain');
+                     queryLower.includes('explain')
+  );
 
   // Greeting reply
   if (isGreeting) {
@@ -194,7 +202,7 @@ Here are 3 customized food recommendations:
 - 💰 Money Saved: **₹350.00** (saved on dining out / imported ingredients)`;
   }
 
-  if (queryLower.includes('energy') || queryLower.includes('electricity') || queryLower.includes('ac ') || queryLower.includes('power') || queryLower.includes('solar') || queryLower.includes('fan')) {
+  if (queryLower.includes('energy') || queryLower.includes('electricity') || queryLower.includes('ac') || queryLower.includes('air conditioning') || queryLower.includes('power') || queryLower.includes('solar') || queryLower.includes('fan') || queryLower.includes('light') || queryLower.includes('watt')) {
     return `Hi **${profile.displayName}**! Energy consumption accounts for a significant portion of home emissions.
 
 Here are 3 tailored recommendations:
