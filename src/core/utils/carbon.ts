@@ -85,8 +85,8 @@ export function calculateEcoScore(profile: OnboardingProfile): number {
 
   // 5. Waste (max 15 points)
   const recyclePercent = profile.wasteRecyclePercentage;
-  if (recyclePercent < 20) score -= 12;
-  else if (recyclePercent < 50) score -= 8;
+  if (recyclePercent <= 20) score -= 12;
+  else if (recyclePercent <= 50) score -= 8;
   else if (recyclePercent < 80) score -= 3;
 
   return Math.max(10, Math.min(100, score));

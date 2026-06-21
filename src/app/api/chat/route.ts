@@ -107,7 +107,7 @@ What should we check next? You can check out active **Missions** on your dashboa
     const msg = history[i];
     if (msg.role === 'model') {
       const content = msg.content.toLowerCase();
-      if (content.includes('commuting') || content.includes('metro') || content.includes('scooter') || content.includes('ev ') || content.includes('travel')) {
+      if (content.includes('commuting') || content.includes('metro') || content.includes('scooter') || /\bev\b/i.test(content) || content.includes('travel')) {
         lastTopic = 'travel';
         break;
       }
@@ -115,7 +115,7 @@ What should we check next? You can check out active **Missions** on your dashboa
         lastTopic = 'diet';
         break;
       }
-      if (content.includes('energy') || content.includes('electricity') || content.includes('ac ') || content.includes('solar') || content.includes('surya ghar')) {
+      if (content.includes('energy') || content.includes('electricity') || /\bac\b/i.test(content) || content.includes('solar') || content.includes('surya ghar')) {
         lastTopic = 'energy';
         break;
       }
@@ -128,14 +128,14 @@ What should we check next? You can check out active **Missions** on your dashboa
 
   // 4. DETECT SPECIFIC INTENTS
   const isSolar = queryLower.includes('solar') || queryLower.includes('panel') || queryLower.includes('rooftop') || queryLower.includes('surya ghar');
-  const isAC = queryLower.includes('ac') || queryLower.includes('air cond') || queryLower.includes('cooling') || queryLower.includes('temperature') || queryLower.includes('compressor');
+  const isAC = /\bac\b/i.test(queryLower) || queryLower.includes('air cond') || queryLower.includes('cooling') || queryLower.includes('temperature') || queryLower.includes('compressor');
   const isMetro = queryLower.includes('metro') || queryLower.includes('train') || queryLower.includes('transit') || queryLower.includes('bus');
-  const isEV = queryLower.includes('ev') || queryLower.includes('electric') || queryLower.includes('scooter') || queryLower.includes('ather') || queryLower.includes('ola');
+  const isEV = /\bev\b/i.test(queryLower) || queryLower.includes('electric') || queryLower.includes('scooter') || queryLower.includes('ather') || queryLower.includes('ola');
   const isMillet = queryLower.includes('millet') || queryLower.includes('ragi') || queryLower.includes('jowar') || queryLower.includes('bajra') || queryLower.includes('grain');
   const isDiet = queryLower.includes('diet') || queryLower.includes('food') || queryLower.includes('eat') || queryLower.includes('meat') || queryLower.includes('vegan') || queryLower.includes('vegetarian');
   const isWaste = queryLower.includes('waste') || queryLower.includes('recycle') || queryLower.includes('compost') || queryLower.includes('segregat') || queryLower.includes('trash') || queryLower.includes('garbage');
   const isWater = queryLower.includes('water') || queryLower.includes('tap') || queryLower.includes('aerator') || queryLower.includes('shower');
-  const isMissions = queryLower.includes('mission') || queryLower.includes('challenge') || queryLower.includes('streak') || queryLower.includes('xp');
+  const isMissions = queryLower.includes('mission') || queryLower.includes('challenge') || queryLower.includes('streak') || /\bxp\b/i.test(queryLower);
 
   // Check if any specific topic was matching
   const hasTopicMatch = isSolar || isAC || isMetro || isEV || isMillet || isDiet || isWaste || isWater || isMissions;
