@@ -29,7 +29,7 @@ export default function Dashboard() {
   const [activeHistoryIndex, setActiveHistoryIndex] = useState(3);
   const [schedulerRunning, setSchedulerRunning] = useState(false);
   const [reportSuccess, setReportSuccess] = useState(false);
-  const [manualSavingInputs, setManualSavingInputs] = useState({ co2: 5, electricity: 10, fuel: 3, water: 50 });
+
 
   // Guard routing
   useEffect(() => {
@@ -71,21 +71,7 @@ export default function Dashboard() {
     });
   };
 
-  const handleAddSavings = async () => {
-    await addManualSavings(
-      manualSavingInputs.co2,
-      manualSavingInputs.electricity,
-      manualSavingInputs.fuel,
-      manualSavingInputs.water
-    );
-    canvasConfetti({
-      particleCount: 60,
-      spread: 40,
-      origin: { y: 0.6 }
-    });
-    // Reset manual saving inputs
-    setManualSavingInputs({ co2: 5, electricity: 10, fuel: 3, water: 50 });
-  };
+
 
   // SVG Chart points computation
   const chartHeight = 140;
@@ -224,25 +210,34 @@ export default function Dashboard() {
 
           {/* Quick Manual Carbon Offsets */}
           <div className="border-t border-border pt-4 mt-4 flex flex-wrap items-center justify-between gap-4">
-            <span className="text-xs text-gray-300">Quick savings offset log:</span>
+            <span className="text-xs text-gray-300">Quick log daily saving offset:</span>
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setManualSavingInputs(p => ({ ...p, co2: p.co2 + 5, electricity: p.electricity + 10 }))}
-                className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-xs font-semibold px-2.5 py-1 rounded"
+                onClick={async () => {
+                  await addManualSavings(5, 10, 0, 0);
+                  canvasConfetti({ particleCount: 40, spread: 30, origin: { y: 0.8 } });
+                }}
+                className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer"
               >
-                +10 kWh Power
+                ⚡ +10 kWh Power
               </button>
               <button
-                onClick={() => setManualSavingInputs(p => ({ ...p, co2: p.co2 + 15, fuel: p.fuel + 5 }))}
-                className="bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-semibold px-2.5 py-1 rounded"
+                onClick={async () => {
+                  await addManualSavings(15, 0, 5, 0);
+                  canvasConfetti({ particleCount: 40, spread: 30, origin: { y: 0.8 } });
+                }}
+                className="bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer"
               >
-                +5L Petrol (Walk)
+                🚗 +5L Petrol (Walk)
               </button>
               <button
-                onClick={handleDiscard => handleAddSavings()}
-                className="bg-emerald-500 text-slate-950 font-bold text-xs px-3 py-1 rounded"
+                onClick={async () => {
+                  await addManualSavings(1, 0, 0, 50);
+                  canvasConfetti({ particleCount: 40, spread: 30, origin: { y: 0.8 } });
+                }}
+                className="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer"
               >
-                Record Offsets
+                💧 +50L Water
               </button>
             </div>
           </div>

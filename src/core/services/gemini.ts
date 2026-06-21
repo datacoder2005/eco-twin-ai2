@@ -56,11 +56,115 @@ Ensure advice is specific, highly actionable, and includes:
   }
 
   // --- MOCK FALLBACK ---
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate networking lag
+  await new Promise(resolve => setTimeout(resolve, 800)); // Simulate networking lag
   
-  const queryLower = userQuery.toLowerCase();
+  const queryLower = userQuery.trim().toLowerCase();
   
-  if (queryLower.includes('travel') || queryLower.includes('commute') || queryLower.includes('car') || queryLower.includes('bus')) {
+  // 1. Identify conversational greetings
+  const greetings = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'howdy', 'yo'];
+  const isGreeting = greetings.some(g => queryLower === g || queryLower.startsWith(g + ' '));
+  
+  // 2. Identify conversational thank yous
+  const thanks = ['thanks', 'thank you', 'cool', 'awesome', 'great', 'ok', 'okay', 'perfect', 'got it'];
+  const isThanks = thanks.some(t => queryLower === t || queryLower.startsWith(t + ' '));
+
+  // 3. Scan history to find the last discussed topic
+  let lastTopic: 'travel' | 'diet' | 'energy' | 'waste' | 'general' = 'general';
+  for (let i = history.length - 1; i >= 0; i--) {
+    const msg = history[i];
+    if (msg.role === 'model') {
+      const content = msg.content.toLowerCase();
+      if (content.includes('commuting') || content.includes('metro') || content.includes('fuel')) {
+        lastTopic = 'travel';
+        break;
+      }
+      if (content.includes('diet') || content.includes('food') || content.includes('millet')) {
+        lastTopic = 'diet';
+        break;
+      }
+      if (content.includes('energy') || content.includes('electricity') || content.includes('ac ')) {
+        lastTopic = 'energy';
+        break;
+      }
+      if (content.includes('waste') || content.includes('compost') || content.includes('recycle')) {
+        lastTopic = 'waste';
+        break;
+      }
+    }
+  }
+
+  // 4. Check if the query is a follow-up question
+  const isFollowUp = queryLower.includes('why') || 
+                     queryLower.includes('how') || 
+                     queryLower.includes('tell me more') || 
+                     queryLower.includes('what else') || 
+                     queryLower.includes('suggest more') || 
+                     queryLower.includes('detail') ||
+                     queryLower.includes('explain');
+
+  // Greeting reply
+  if (isGreeting) {
+    return `Hello **${profile.displayName}**! Glad to chat with you. 
+
+As your **EcoCoach**, I'm ready to help you lower your carbon footprint in India. We can focus on:
+- **Travel** 🚗 (switching to EVs, choosing metro routes, ride sharing)
+- **Diet** 🥗 (incorporating millets, plant-based swaps, reducing water usage)
+- **Energy** ⚡ (AC optimizations, PM Surya Ghar solar rooftop, BEE star ratings)
+- **Waste** ♻️ (dry/wet segregation, neighborhood composting)
+
+Which of these would you like to explore or optimize today?`;
+  }
+
+  // Thank you reply
+  if (isThanks) {
+    return `You're very welcome, **${profile.displayName}**! 🌟
+
+Remember, minor habit changes (like switching off standby plugs or choosing millets) add up to massive offsets when scaled across our global simulator. 
+
+What should we check next? You can ask me about other areas like **Home Solar Rooftops** or **Sustainable Commutes**.`;
+  }
+
+  // Follow-up details based on previous topic
+  if (isFollowUp) {
+    if (lastTopic === 'travel') {
+      return `To explain further about **Travel offsets**:
+- **Why Metro is highly efficient**: Indian Metro systems operate on electric grids designed for mass transport, reducing the per-commuter carbon weight from 120g/km (petrol car) to less than 15g/km.
+- **EV Scooter Cost Benefit**: EV battery cells consume grid power at roughly ₹8 per unit. A full charge (3 units = ₹24) gives you an 80km range, saving massive fuel expenses.
+- **Tire Pressure offset**: Keeping your vehicle tires inflated to target PSI reduces friction and saves up to **4% petrol** automatically.
+
+Would you like me to suggest a specific transit route planning strategy for your city?`;
+    }
+    
+    if (lastTopic === 'diet') {
+      return `Here are more details about **Diet & Water footprints**:
+- **Millet Farming Advantage**: Crops like Ragi and Jowar are indigenous dryland crops. Unlike polished white rice, they don't require flooded paddies, saving almost **6,000 liters of water per kg cultivated**.
+- **Local vs Imported Foods**: Buying local seasonal fruits like mangoes or bananas has zero air-freight transport overhead compared to imported fruits like Washington apples or berries.
+- **Organic Waste Segregation**: Wet kitchen waste, when trapped in mixed plastic garbage in landfills, undergoes anaerobic decomposition generating **methane** (which is 25x more potent than CO2 at trapping heat). Composting it converts it into rich soil carbon instead.
+
+Do you want some quick recipes for incorporating millets into your daily breakfasts?`;
+    }
+
+    if (lastTopic === 'energy') {
+      return `Deep-diving into **Home Energy optimizations**:
+- **How AC setting saves money**: Setting your AC unit to 25°C instead of 18°C consumes up to **28% less power units** because the compressor cycle shuts off as soon as the target temperature is reached, maintaining stability.
+- **BEE Energy Star Ratings**: A 5-Star BEE inverter refrigerator consumes roughly 150 kWh/year, while a standard 2-Star non-inverter model consumes 380 kWh/year, saving you about ₹1,800 annually.
+- **Surya Ghar Muft Bijli scheme**: The Indian government offers up to ₹78,000 subsidy for a 3kW rooftop solar installation, which can fully power a medium household and generate passive credit on net-metering.
+
+Would you like tips on choosing energy-efficient ceiling fans (BLDC fans) next?`;
+    }
+
+    if (lastTopic === 'waste') {
+      return `To expand on **Waste & Composting offsets**:
+- **Segregation Basics**: Keeping dry recyclables (cardboard, clean plastics, metals) dry is critical. Once food waste spills on paper, it cannot be recycled by local kabadiwalas.
+- **Single-use Plastic alternatives**: Indian markets are actively shifting back to cloth/jute bags. Carrying a canvas bag in your car avoids the plastic bag fee and prevents microplastic leakage.
+- **Recycle Milestones**: Segregating 80% of waste earns you the **Zero-Waste Champion** badge in our missions list.
+
+What aspect of home composting would you like to set up first?`;
+    }
+  }
+
+  // 5. Keyword checks for direct topics
+  if (queryLower.includes('travel') || queryLower.includes('commute') || queryLower.includes('car') || queryLower.includes('bus') || queryLower.includes('transit') || queryLower.includes('metro') || queryLower.includes('petrol') || queryLower.includes('scooter')) {
     return `Hello **${profile.displayName}**! Based on your profile, transportation is an area where we can achieve massive carbon reductions.
 
 Here are 3 tailored recommendations for India commuting:
@@ -75,7 +179,7 @@ Here are 3 tailored recommendations for India commuting:
 - 💰 Money Saved: **₹480.00** (saved on petrol and cab surge fares)`;
   }
 
-  if (queryLower.includes('diet') || queryLower.includes('food') || queryLower.includes('eat') || queryLower.includes('meat')) {
+  if (queryLower.includes('diet') || queryLower.includes('food') || queryLower.includes('eat') || queryLower.includes('meat') || queryLower.includes('vegan') || queryLower.includes('vegetarian') || queryLower.includes('millet')) {
     return `Hello **${profile.displayName}**! Swapping your diet is the single fastest way to lower your daily water and carbon footprints.
 
 Here are 3 customized food recommendations:
@@ -90,7 +194,7 @@ Here are 3 customized food recommendations:
 - 💰 Money Saved: **₹350.00** (saved on dining out / imported ingredients)`;
   }
 
-  if (queryLower.includes('energy') || queryLower.includes('electricity') || queryLower.includes('ac') || queryLower.includes('power')) {
+  if (queryLower.includes('energy') || queryLower.includes('electricity') || queryLower.includes('ac ') || queryLower.includes('power') || queryLower.includes('solar') || queryLower.includes('fan')) {
     return `Hi **${profile.displayName}**! Energy consumption accounts for a significant portion of home emissions.
 
 Here are 3 tailored recommendations:
@@ -105,14 +209,30 @@ Here are 3 tailored recommendations:
 - 💰 Money Saved: **₹650.00** (saved on monthly electrical utility bills)`;
   }
 
-  return `Hello **${profile.displayName}**! I'm your EcoCoach. I can assist you with local carbon reduction strategies in India.
+  if (queryLower.includes('waste') || queryLower.includes('recycle') || queryLower.includes('compost') || queryLower.includes('trash') || queryLower.includes('garbage')) {
+    return `Hello **${profile.displayName}**! Waste management is critical for cutting methane emissions.
 
-Based on your current profile (EcoScore: **${profile.ecoScore}**, Streak: **${profile.currentStreak}** days), here are three general quick wins:
-1. **Segregate Dry & Wet Waste**: Setting up home composting reduces household landfill methane contributions.
-2. **Water Tap Aerators**: Fitting ₹150 aerators onto kitchen and bathroom taps cuts water flow rate by **50%** without reducing pressure.
-3. **Carry a Reusable Bag**: Keeping a canvas tote in your vehicle eliminates single-use plastic bag fees and pollution.
+Here are 3 tailored recommendations:
+1. **Segregate Wet and Dry Waste**: Setup separate home bins. Dry clean recyclables (paper, tins, plastics) should not mix with wet organic kitchen scraps.
+2. **Home Composting**: Use simple aerated terra-cotta composter pots for vegetable peels and coffee grounds.
+3. **Say No to Single-Use Plastic**: Keep 2 canvas tote bags in your vehicle so you never have to accept polythene bags from grocery stores.
 
-What specific area (Travel, Diet, or Energy) would you like to deep-dive into today?`;
+**Weekend Challenge**: "Trash Segregator" — Commit to keeping 100% of your paper, cardboard, and metal cans clean and dry for your local kabadiwala this week.
+
+**Estimated Savings**:
+- 🟢 CO2 Saved: **6 kg CO2e**
+- 💰 Money Saved: **₹150.00**`;
+  }
+
+  // Fallback for unrecognized questions
+  return `Hi **${profile.displayName}**! Interesting question. While I'm in mock demonstration mode, I can provide direct contextual sustainability facts for India in these domains:
+
+1. **Travel**: Reducing petrol fuel combustion or switching to EV options.
+2. **Diet**: Substituting crops like rice with low-water millets and trying vegan/vegetarian meal swaps.
+3. **Energy**: Setting your home AC temperature to 25°C, using BLDC fans, or Surya Ghar solar rooftop subsidies.
+4. **Waste**: Recycling cardboard/plastics and segregation.
+
+Could you ask me a question related to one of these areas, or say "tell me more" to expand on what we were discussing?`;
 }
 
 /**
