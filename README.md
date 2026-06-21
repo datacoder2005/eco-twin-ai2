@@ -107,5 +107,7 @@ Ensure the following composite indexes are deployed for collection groups:
    npm run dev
    ```
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+  
+5. Live app : [http://localhost:3000](http://localhost:3000) in your browser.
 
 > **Note on API Keys**: If no `NEXT_PUBLIC_GEMINI_API_KEY` is provided inside `.env`, the platform operates in standalone **Interactive Mock Mode**, allowing judges to test every AI feature out-of-the-box using simulated Gemini outputs.
