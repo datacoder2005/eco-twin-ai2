@@ -23,36 +23,23 @@ export async function generateEcoCoachResponse(
   history: CoachMessage[],
   userQuery: string
 ): Promise<string> {
-  const systemPrompt = `You are EcoCoach, a Staff Sustainability Systems Analyst.
-Review the following user profile and metrics:
-User Name: ${profile.displayName}
-Onboarding Habits: ${JSON.stringify(profile.sustainabilityProfile || {})}
-Current EcoScore: ${profile.ecoScore}
-Current Streak: ${profile.currentStreak} days
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ profile, history, userQuery }),
+    });
 
-Answer the user's sustainability questions using local context (India region).
-Ensure advice is specific, highly actionable, and includes:
-1. Three customized local recommendations.
-2. One weekend challenge.
-3. Estimated savings (in kg CO2 and INR).`;
-
-  if (aiClient) {
-    try {
-      // Connect to Google Gen AI using gemini-2.5-pro or flash
-      const model = aiClient.getGenerativeModel({ model: 'gemini-2.5-flash' });
-      const contents = [
-        { role: 'system', parts: [{ text: systemPrompt }] },
-        ...history.map(msg => ({
-          role: msg.role === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.content }]
-        })),
-        { role: 'user', parts: [{ text: userQuery }] }
-      ];
-      const result = await model.generateContent({ contents });
-      return result.response.text();
-    } catch (error) {
-      console.error('Error calling real Gemini API, falling back to mock:', error);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.reply) {
+        return data.reply;
+      }
     }
+  } catch (error) {
+    console.error('Failed to call server-side API chat route, falling back to client mock:', error);
   }
 
   // --- MOCK FALLBACK ---
